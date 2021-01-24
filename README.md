@@ -17,7 +17,7 @@ Notice!! Do not press anything on the keyboard or move the focus from the remote
 
 ## Installation
 
-Download a pre-compiled .exe version from: https://fob.bar/keypaster++.exe
+Download a pre-compiled .exe version from: https://github.com/hacke78/Paster-plus-plus/releases
 
 ## How to build
 
