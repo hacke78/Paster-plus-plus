@@ -11,7 +11,3 @@
 #include <string>
 #include <regex>
 #include <cmath>
-#include <objidl.h>
-#include <objbase.h>
-#include <gdiplus.h>
-#include <wingdi.h>

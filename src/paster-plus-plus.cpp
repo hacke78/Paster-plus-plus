@@ -7,9 +7,8 @@
 
 
 
-using namespace std;
-using namespace Gdiplus;
-#pragma comment (lib,"Gdiplus.lib")
+//using namespace std;
+
 namespace constants {
     const std::string PRODUCT_NAME = "Keypaster++";
     const std::string PRODUCT_VERSION = "v1.0";
@@ -50,7 +49,7 @@ void clear_message_queue() {
 //# This works when in a console which is the intended purpose of this utility
 //################################################################################################################
 void force_eng_kbd_layout(){
-    LoadKeyboardLayout((LPCWSTR) "00000409", KLF_ACTIVATE);
+    LoadKeyboardLayoutA(INPUT_LOCALE, KLF_ACTIVATE);
 
 }
 
@@ -77,7 +76,7 @@ void __cdecl odprintf(const char* format, ...)
     *p++ = '\n';
     *p = '\0';
 
-    OutputDebugString((LPCWSTR) buf);
+    OutputDebugStringA(buf);
 }
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
@@ -140,7 +139,7 @@ ProgressBar_handler::ProgressBar_handler() {
     WNDCLASSEX wc = { 0 };
     wc.lpfnWndProc = WindowProc;
     wc.hInstance = GetModuleHandle(NULL);
-    wc.lpszClassName = (LPCWSTR) "keypaster-plus-plus";
+    wc.lpszClassName = (LPCSTR) "keypaster-plus-plus";
     wc.cbSize = sizeof(WNDCLASSEX);
     wc.style = 0;
     wc.lpfnWndProc = WindowProc;
@@ -152,12 +151,12 @@ ProgressBar_handler::ProgressBar_handler() {
     //wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
     wc.hbrBackground = CreateSolidBrush(RGB(0, 0, 255));
     wc.lpszMenuName = NULL;
-    wc.lpszClassName = (LPCWSTR) g_szClassName;
+    wc.lpszClassName = g_szClassName;
     wc.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
     RegisterClassEx(&wc);
 
     // Create the main window for the progress bar
-    hwnd = CreateWindowEx(WS_EX_TOPMOST | WS_EX_TOOLWINDOW, (LPCWSTR) g_szClassName, (LPCWSTR) "Main Window", WS_POPUP | WS_VISIBLE, 0, 0, 0, 0, NULL, NULL, wc.hInstance, NULL);
+    hwnd = CreateWindowEx(WS_EX_TOPMOST | WS_EX_TOOLWINDOW, (LPCSTR) g_szClassName, (LPCSTR) "Main Window", WS_POPUP | WS_VISIBLE, 0, 0, 0, 0, NULL, NULL, wc.hInstance, NULL);
     if (hwnd) { 
         ShowWindow(hwnd, SW_SHOW);
         _UpdateWindow(); 
@@ -168,7 +167,7 @@ ProgressBar_handler::ProgressBar_handler() {
     Sleep (1000);
     
     // Create the text box for the progress text
-    hwndTextBox = CreateWindowEx(WS_EX_TRANSPARENT, (LPCWSTR) "STATIC", (LPCWSTR) "50/100", WS_CHILD | SS_LEFT, 0, 0, ScreenWidth, (int) (ScreenHeight * ProgressBarSize), hwnd, NULL, wc.hInstance, NULL);
+    hwndTextBox = CreateWindowExA(WS_EX_TRANSPARENT, "STATIC", "", WS_CHILD | SS_LEFT, 0, 0, ScreenWidth, (int) (ScreenHeight * ProgressBarSize), hwnd, NULL, wc.hInstance, NULL);
     HFONT hFont = CreateFontA((int) (ScreenHeight * ProgressBarSize), 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_SWISS, ProgressBarFont);
     SendMessage(hwndTextBox, WM_SETFONT, WPARAM(hFont), TRUE);
     ShowWindow(hwndTextBox, SW_SHOW);
@@ -177,13 +176,11 @@ ProgressBar_handler::ProgressBar_handler() {
 }
 
 void ProgressBar_handler::Update(int progress, int max) {
-    //char *text = new char[10];
-    string text;
+    std::string text;
     
-    //sprintf_s(text, "%d/100", progress);
-    text = to_string(progress + 1) + "/" + to_string(max);
+    text = std::to_string(progress + 1) + "/" + std::to_string(max);
     SendMessage(hwndTextBox, WM_SETTEXT, 0, (LPARAM)text.c_str());
-    SetWindowPos(hwnd, 0, 0, 0, (int) std::round(ScreenWidth * (progress + 1)/max), (int) (ScreenHeight * ProgressBarSize), SWP_NOACTIVATE | SWP_SHOWWINDOW | SWP_NOMOVE);
+    SetWindowPos(hwnd, 0, 0, 0, (int) round(ScreenWidth * (progress + 1)/max), (int) (ScreenHeight * ProgressBarSize), SWP_NOACTIVATE | SWP_SHOWWINDOW | SWP_NOMOVE);
     _UpdateWindow();
 }
 
@@ -233,7 +230,7 @@ public:
         }
 
         // Save text in a string class instance
-        ClipBoardContent = pszText;
+        ClipBoardContent = std::string(pszText);
         ClipBoardLength = ClipBoardContent.length();
         
         // Replace \n\r with \n
@@ -259,7 +256,7 @@ public:
 private:
     size_t CharPosition;
     size_t ClipBoardLength;
-    string ClipBoardContent;
+    std::string ClipBoardContent;
 
 };
 
@@ -271,7 +268,7 @@ public:
         short virtKeyCode_raw = VkKeyScanW(ch);
         short virtKeyCode = virtKeyCode_raw & 0xFF; // Extract the low byte part(key)
         short shift_state = (virtKeyCode_raw & 0xFF00) >> 8; // Extract the hi byte part(shift state)
-        UINT scancode = MapVirtualKeyEx(virtKeyCode, MAPVK_VK_TO_VSC, LoadKeyboardLayout((LPCWSTR)INPUT_LOCALE, KLF_ACTIVATE));
+        UINT scancode = MapVirtualKeyEx(virtKeyCode, MAPVK_VK_TO_VSC, LoadKeyboardLayoutA(INPUT_LOCALE, KLF_ACTIVATE));
         Sleep(20);
         odprintf("shift state: %d\n", (int) shift_state);
         odprintf("Scancode: %d\n", scancode);
@@ -295,6 +292,11 @@ public:
             case SS_SHIFT_ALT: SendScanCode(SC_LSHIFT, KEYEVENTF_KEYUP); SendScanCode(SC_ALT, KEYEVENTF_KEYUP); break;
             case SS_ALT_CTRL: SendScanCode(SC_ALT, KEYEVENTF_KEYUP); SendScanCode(SC_CTRL, KEYEVENTF_KEYUP); break;
         }
+    }
+    void ResetShiftKeys() {
+        SendScanCode(SC_LSHIFT, KEYEVENTF_KEYUP);
+        SendScanCode(SC_CTRL, KEYEVENTF_KEYUP);
+        SendScanCode(SC_ALT, KEYEVENTF_KEYUP);
     }
 private:
     void SendScanCode(DWORD code, int state=0) {
@@ -335,6 +337,8 @@ HotKey_handler::HotKey_handler() {
                 odprintf("WM_HOTKEY paste received\n");
                 ClipBoard_handler* clipboard = new ClipBoard_handler();
                 kbdEmulator_handler* kbdEmulator = new kbdEmulator_handler;
+                kbdEmulator->ResetShiftKeys();
+                force_eng_kbd_layout();
                 Sleep(500);
                 for (int i = 0; i < clipboard->GetClipBoardSize(); i++) {
                     progress_bar->Update(i, (int) clipboard->GetClipBoardSize());
@@ -349,7 +353,9 @@ HotKey_handler::HotKey_handler() {
             if (msg.wParam == QUIT_KEYID) {
                 odprintf("WM_HOTKEY quit received\n");
                 odprintf("program quit");
-                int msgboxID = MessageBoxA(NULL, "Paster++ terminated", "Paster++ v1.0 by Daniel Alfredsson", MB_OK | MB_ICONINFORMATION);
+                std::string MsgBoxText = constants::PRODUCT_NAME + "Terminated";
+                std::string MsxBoxCaption = constants::PRODUCT_NAME + " " + constants::PRODUCT_VERSION + " by Daniel Alfredsson";
+                int msgboxID = MessageBoxA(NULL, MsgBoxText.c_str(), MsxBoxCaption.c_str(), MB_OK | MB_ICONINFORMATION | MB_TOPMOST | MB_SETFOREGROUND | MB_DEFAULT_DESKTOP_ONLY);
                 exit(0);
 
             }
@@ -363,12 +369,12 @@ HotKey_handler::HotKey_handler() {
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow)
 {
     odprintf("Program start");
-    std::string MsgBoxText = "This utility lets you paste content from clipboard into remote consoles\n\nUse CTRL+ALT+V to paste.\n\nMore info: " + constants::PRODUCT_INFO;
+    std::string MsgBoxText = "This utility lets you paste content from clipboard into a remote console\n\nUsage:\nCTRL+ALT+V to paste.\nCTRL+ALT+Q to quit\n\nFor more info: " + constants::PRODUCT_INFO;
     std::string MsxBoxCaption = constants::PRODUCT_NAME + " " + constants::PRODUCT_VERSION + " by Daniel Alfredsson";
     int nButtonPressed = 0;
     
 
-    int msgboxID = MessageBoxA(NULL, MsgBoxText.c_str(), MsxBoxCaption.c_str(), MB_OK | MB_ICONINFORMATION);
+    int msgboxID = MessageBoxA(NULL, MsgBoxText.c_str(), MsxBoxCaption.c_str(), MB_OK | MB_ICONINFORMATION | MB_TOPMOST | MB_SETFOREGROUND | MB_DEFAULT_DESKTOP_ONLY);
  
     clear_message_queue();
     force_eng_kbd_layout();

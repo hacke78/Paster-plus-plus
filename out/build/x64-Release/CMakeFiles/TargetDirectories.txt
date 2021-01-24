@@ -1,0 +1,3 @@
+C:/Users/daa/source/repos/hacke78/Paster-plus-plus/out/build/x64-Release/CMakeFiles/Paster-plus-plus.dir
+C:/Users/daa/source/repos/hacke78/Paster-plus-plus/out/build/x64-Release/CMakeFiles/edit_cache.dir
+C:/Users/daa/source/repos/hacke78/Paster-plus-plus/out/build/x64-Release/CMakeFiles/rebuild_cache.dir
