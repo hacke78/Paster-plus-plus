@@ -128,7 +128,7 @@ private:
 
 };
 
-#define WindowsClassName "keypaster-plus-plus";
+#define WindowClassName "keypaster-plus-plus";
 
 ProgressBar_handler::ProgressBar_handler() {
     // Get the current Windows system screen size
@@ -141,7 +141,7 @@ ProgressBar_handler::ProgressBar_handler() {
     WNDCLASSEXA wc = { 0 };
     wc.lpfnWndProc = WindowProc;
     wc.hInstance = GetModuleHandle(NULL);
-    wc.lpszClassName = WindowsClassName;
+    wc.lpszClassName = WindowClassName;
     wc.cbSize = sizeof(WNDCLASSEX);
     wc.style = 0;
     wc.lpfnWndProc = WindowProc;
