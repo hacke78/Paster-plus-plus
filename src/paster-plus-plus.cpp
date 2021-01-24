@@ -128,6 +128,8 @@ private:
 
 };
 
+#define WindowsClassName "keypaster-plus-plus";
+
 ProgressBar_handler::ProgressBar_handler() {
     // Get the current Windows system screen size
     // FIXME: This might not well work if user changes the screen resolution after the program has started
@@ -139,7 +141,7 @@ ProgressBar_handler::ProgressBar_handler() {
     WNDCLASSEX wc = { 0 };
     wc.lpfnWndProc = WindowProc;
     wc.hInstance = GetModuleHandle(NULL);
-    wc.lpszClassName = (LPCSTR) "keypaster-plus-plus";
+    wc.lpszClassName = L"paster-plus-plus";
     wc.cbSize = sizeof(WNDCLASSEX);
     wc.style = 0;
     wc.lpfnWndProc = WindowProc;
@@ -151,12 +153,11 @@ ProgressBar_handler::ProgressBar_handler() {
     //wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
     wc.hbrBackground = CreateSolidBrush(RGB(0, 0, 255));
     wc.lpszMenuName = NULL;
-    wc.lpszClassName = g_szClassName;
     wc.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
     RegisterClassEx(&wc);
 
     // Create the main window for the progress bar
-    hwnd = CreateWindowEx(WS_EX_TOPMOST | WS_EX_TOOLWINDOW, (LPCSTR) g_szClassName, (LPCSTR) "Main Window", WS_POPUP | WS_VISIBLE, 0, 0, 0, 0, NULL, NULL, wc.hInstance, NULL);
+    hwnd = CreateWindowExA(WS_EX_TOPMOST | WS_EX_TOOLWINDOW, (LPCSTR) g_szClassName, (LPCSTR) "Main Window", WS_POPUP | WS_VISIBLE, 0, 0, 0, 0, NULL, NULL, wc.hInstance, NULL);
     if (hwnd) { 
         ShowWindow(hwnd, SW_SHOW);
         _UpdateWindow(); 
