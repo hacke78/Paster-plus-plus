@@ -2,7 +2,7 @@
 // Paster++ 
 //
 // Copywrite (C) Daniel Alfredsson, daniel@alfredsson.nu, 2021
-#pragma once
+
 #include "paster-plus-plus.h"
 
 
