@@ -138,10 +138,10 @@ ProgressBar_handler::ProgressBar_handler() {
     
     // Create winod Class for the main window
     const char g_szClassName[] = "myWindowClass";
-    WNDCLASSEX wc = { 0 };
+    WNDCLASSEXA wc = { 0 };
     wc.lpfnWndProc = WindowProc;
     wc.hInstance = GetModuleHandle(NULL);
-    wc.lpszClassName = L"paster-plus-plus";
+    wc.lpszClassName = WindowsClassName;
     wc.cbSize = sizeof(WNDCLASSEX);
     wc.style = 0;
     wc.lpfnWndProc = WindowProc;
@@ -154,7 +154,7 @@ ProgressBar_handler::ProgressBar_handler() {
     wc.hbrBackground = CreateSolidBrush(RGB(0, 0, 255));
     wc.lpszMenuName = NULL;
     wc.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
-    RegisterClassEx(&wc);
+    RegisterClassExA(&wc);
 
     // Create the main window for the progress bar
     hwnd = CreateWindowExA(WS_EX_TOPMOST | WS_EX_TOOLWINDOW, (LPCSTR) g_szClassName, (LPCSTR) "Main Window", WS_POPUP | WS_VISIBLE, 0, 0, 0, 0, NULL, NULL, wc.hInstance, NULL);

@@ -1,0 +1,3 @@
+/home/daa/src/Paster-plus-plus/CMakeFiles/rebuild_cache.dir
+/home/daa/src/Paster-plus-plus/CMakeFiles/edit_cache.dir
+/home/daa/src/Paster-plus-plus/CMakeFiles/Paster-plus-plus.dir

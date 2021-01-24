@@ -1,0 +1,1 @@
+/usr/bin/x86_64-w64-mingw32-g++  -mwindows -static -municode   CMakeFiles/Paster-plus-plus.dir/src/paster-plus-plus.cpp.o  -o Paster-plus-plus 
