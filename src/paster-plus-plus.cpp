@@ -76,7 +76,7 @@ void __cdecl odprintf(const char* format, ...)
     *p++ = '\n';
     *p = '\0';
 
-    OutputDebugStringA(buf);
+    OutputDebugString(buf);
 }
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
@@ -128,7 +128,7 @@ private:
 
 };
 
-#define WindowClassName "keypaster-plus-plus";
+
 
 ProgressBar_handler::ProgressBar_handler() {
     // Get the current Windows system screen size
@@ -141,7 +141,7 @@ ProgressBar_handler::ProgressBar_handler() {
     WNDCLASSEXA wc = { 0 };
     wc.lpfnWndProc = WindowProc;
     wc.hInstance = GetModuleHandle(NULL);
-    wc.lpszClassName = WindowClassName;
+    wc.lpszClassName = g_szClassName;
     wc.cbSize = sizeof(WNDCLASSEX);
     wc.style = 0;
     wc.lpfnWndProc = WindowProc;
@@ -150,7 +150,6 @@ ProgressBar_handler::ProgressBar_handler() {
     wc.hInstance = GetModuleHandle(NULL);
     wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
     wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-    //wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
     wc.hbrBackground = CreateSolidBrush(RGB(0, 0, 255));
     wc.lpszMenuName = NULL;
     wc.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
@@ -178,10 +177,9 @@ ProgressBar_handler::ProgressBar_handler() {
 
 void ProgressBar_handler::Update(int progress, int max) {
     std::string text;
-    
     text = std::to_string(progress + 1) + "/" + std::to_string(max);
     SendMessage(hwndTextBox, WM_SETTEXT, 0, (LPARAM)text.c_str());
-    SetWindowPos(hwnd, 0, 0, 0, (int) round(ScreenWidth * (progress + 1)/max), (int) (ScreenHeight * ProgressBarSize), SWP_NOACTIVATE | SWP_SHOWWINDOW | SWP_NOMOVE);
+    SetWindowPos(hwnd, 0, 0, 0, (int) std::round(ScreenWidth * (progress + 1)/max), (int) (ScreenHeight * ProgressBarSize), SWP_NOACTIVATE | SWP_SHOWWINDOW);
     _UpdateWindow();
 }
 
@@ -344,7 +342,6 @@ HotKey_handler::HotKey_handler() {
                 for (int i = 0; i < clipboard->GetClipBoardSize(); i++) {
                     progress_bar->Update(i, (int) clipboard->GetClipBoardSize());
                     kbdEmulator->SendKey(clipboard->GetNextChar());
-                    
                 }
 
                 progress_bar->Reset();
@@ -376,7 +373,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
     
 
     int msgboxID = MessageBoxA(NULL, MsgBoxText.c_str(), MsxBoxCaption.c_str(), MB_OK | MB_ICONINFORMATION | MB_TOPMOST | MB_SETFOREGROUND | MB_DEFAULT_DESKTOP_ONLY);
- 
+    
     clear_message_queue();
     force_eng_kbd_layout();
     HotKey_handler *hot_key = new HotKey_handler();
