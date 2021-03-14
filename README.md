@@ -1,9 +1,13 @@
 # Paster++
 
 Remote console copy/paste utility.
-It allows the user to paste the text-based content from clipboard into a remote console.
+It allows a user to paste text-based content from clipboard into a remote console. Many remote console applications does not support standard OS copy/paste.
 
 It supports web-based and clinet based remote console application such as VMware, ILO, IDRAC, IPMI, etc. and allows the user to paste from the normal clipboard into such windows. Remote console applications does not noramlly support the normal copy/past functions. The utility overcomes this by simulating normal keystrokes.
+
+Use-cases:
+- Paste complex passwords from a password vault into to login on console.
+- Transfer code/scripts into a console window where there is no IP network attached.
 
 ## Usage
 
@@ -49,16 +53,14 @@ make
 
 You will now have a single .exe file in the build directory (Paster-plus-plus.exe)
 
-## Known issues
+## Known limitations and issues
 
-- The utility is hard coded to use english keyboard layout as most remote console application assumes a fixed language layout setting.
-- There is a chance keystrokes while pasting is missed or changed. This is primarilly due to hove the remote console applications are implemented and that the utuility is using a low-leve interface to simulate keystrokes.
+- The utility is hard coded to use english keyboard layout as most remote console application assumes a fixed language layout setting. Use local english keyboard layout as a workaround.
+- There is a chance keystrokes while pasting is missed or changed. This is primarilly due to hove the remote console applications are implemented and that the utility is using a low-level interface to simulate keystrokes. Use an checksum calculator to validated the content such as md5sum if this is critical.
 
 ## Contributing
 
 Pull requests are very welcome. For major changes, please open an issue first to discuss what you would like to change.
-This utility
-
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
