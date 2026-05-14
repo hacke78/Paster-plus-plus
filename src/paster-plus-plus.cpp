@@ -13,6 +13,8 @@ namespace constants {
     const std::string PRODUCT_NAME = "Paster++";
     const std::string PRODUCT_VERSION = "v1.0";
     const std::string PRODUCT_INFO = "https://github.com/hacke78/Paster-plus-plus";
+    const std::string PRODUCT_AUTHOR = "Daniel Alfredsson";
+    const std::string PRODUCT_AUTHOR_EMAIL = "daniel@alfredsson.nu";
 }
 
 #define ProgressBarSize     0.02            // Size of the screen in percentage to use for progress bar to adopt for various screen resoultions.
@@ -135,10 +137,10 @@ private:
 
 ProgressBar_handler::ProgressBar_handler() {
     // Get the current Windows system screen size
-    // FIXME: This might not well work if user changes the screen resolution after the program has started
+    // FIXME: This might not work if user changes the screen resolution after the program has started
     ScreenWidth = GetSystemMetrics(SM_CXSCREEN);
     ScreenHeight = GetSystemMetrics(SM_CYSCREEN);
-    
+
     // Create winod Class for the main window
     const char g_szClassName[] = "myWindowClass";
     WNDCLASSEXA wc = { 0 };
@@ -160,15 +162,15 @@ ProgressBar_handler::ProgressBar_handler() {
 
     // Create the main window for the progress bar
     hwnd = CreateWindowExA(WS_EX_TOPMOST | WS_EX_TOOLWINDOW, (LPCSTR) g_szClassName, (LPCSTR) "Main Window", WS_POPUP | WS_VISIBLE, 0, 0, 0, 0, NULL, NULL, wc.hInstance, NULL);
-    if (hwnd) { 
+    if (hwnd) {
         ShowWindow(hwnd, SW_SHOW);
-        _UpdateWindow(); 
+        _UpdateWindow();
     }
     else {
         /*Handle Error*/
     }
     Sleep (1000);
-    
+
     // Create the text box for the progress text
     hwndTextBox = CreateWindowExA(WS_EX_TRANSPARENT, "STATIC", "", WS_CHILD | SS_LEFT, 0, 0, ScreenWidth, (int) (ScreenHeight * ProgressBarSize), hwnd, NULL, wc.hInstance, NULL);
     HFONT hFont = CreateFontA((int) (ScreenHeight * ProgressBarSize), 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_SWISS, ProgressBarFont);
@@ -182,12 +184,11 @@ void ProgressBar_handler::Update(int progress, int max) {
     std::string text;
     text = std::to_string(progress + 1) + "/" + std::to_string(max);
     SendMessage(hwndTextBox, WM_SETTEXT, 0, (LPARAM)text.c_str());
-    SetWindowPos(hwnd, 0, 0, 0, (int) std::round(ScreenWidth * (progress + 1)/max), (int) (ScreenHeight * ProgressBarSize), SWP_NOACTIVATE | SWP_SHOWWINDOW);
+    SetWindowPos(hwnd, 0, 0, 0, (int) std::round(ScreenWidth * (progress + 1)/(double)max), (int) (ScreenHeight * ProgressBarSize), SWP_NOACTIVATE | SWP_SHOWWINDOW);
     _UpdateWindow();
 }
 
 void ProgressBar_handler::Reset() {
-    
     SetWindowPos(hwnd, 0, 0, 0, 0, 0, SWP_NOACTIVATE | SWP_SHOWWINDOW | SWP_NOMOVE);
     _UpdateWindow();
 }
@@ -359,7 +360,7 @@ HotKey_handler::HotKey_handler() {
                 odprintf("WM_HOTKEY quit received\n");
                 odprintf("program quit");
                 std::string MsgBoxText = constants::PRODUCT_NAME + " terminated";
-                std::string MsxBoxCaption = constants::PRODUCT_NAME + " " + constants::PRODUCT_VERSION + " by Daniel Alfredsson";
+                std::string MsxBoxCaption = constants::PRODUCT_NAME + " " + constants::PRODUCT_VERSION + " by " + constants::PRODUCT_AUTHOR + "<" + constants::PRODUCT_AUTHOR_EMAIL + ">";
                 int msgboxID = MessageBoxA(NULL, MsgBoxText.c_str(), MsxBoxCaption.c_str(), MB_OK | MB_ICONINFORMATION | MB_TOPMOST | MB_SETFOREGROUND | MB_DEFAULT_DESKTOP_ONLY);
                 exit(0);
 
