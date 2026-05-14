@@ -1,7 +1,7 @@
 ﻿// CMakeProject1.cpp : Defines the entry point for the application.
 // Paster++ 
 //
-// Copywrite (C) Daniel Alfredsson, daniel@alfredsson.nu, 2021
+// Copyright (C) Daniel Alfredsson, daniel@alfredsson.nu, 2021
 
 #include "paster-plus-plus.h"
 
@@ -10,7 +10,7 @@
 //using namespace std;
 
 namespace constants {
-    const std::string PRODUCT_NAME = "Keypaster++";
+    const std::string PRODUCT_NAME = "Paster++";
     const std::string PRODUCT_VERSION = "v1.0";
     const std::string PRODUCT_INFO = "https://github.com/hacke78/Paster-plus-plus";
 }
@@ -57,6 +57,9 @@ void force_eng_kbd_layout(){
 // debug print function
 //################################################################################################################
 
+#ifdef NDEBUG
+static inline void odprintf(const char*, ...) {}
+#else
 void __cdecl odprintf(const char* format, ...)
 {
     char    buf[4096], * p = buf;
@@ -64,20 +67,21 @@ void __cdecl odprintf(const char* format, ...)
     int     n;
 
     va_start(args, format);
-    n = _vsnprintf(p, sizeof buf - 3, format, args); // buf-3 is room for CR/LF/NUL
+    n = vsnprintf(p, sizeof buf - 3, format, args); // buf-3 is room for CR/LF/NUL
     va_end(args);
 
-    p += (n < 0) ? sizeof buf - 3 : n;
+    p += (n < 0 || (size_t)n >= sizeof buf - 3) ? sizeof buf - 3 : n;
 
-    while (p > buf && isspace(p[-1]))
+    while (p > buf && isspace((unsigned char)p[-1]))
         *--p = '\0';
 
     *p++ = '\r';
     *p++ = '\n';
     *p = '\0';
 
-    OutputDebugString(buf);
+    OutputDebugStringA(buf);
 }
+#endif
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
@@ -89,7 +93,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
         case WM_CLOSE:
         {
             DestroyWindow(hwnd);
-            break;
+            return 0;
         }
         case WM_PAINT:
         {
@@ -97,17 +101,16 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             HDC hdc = BeginPaint(hwnd, &ps);
             //FillRect(hdc, &ps.rcPaint, (HBRUSH)(COLOR_WINDOW + 1));
             EndPaint(hwnd, &ps);
+            return 0;
         }
-        
         case WM_CTLCOLORSTATIC:
         {
             HDC hdcStatic = (HDC)wParam;
-	    SetBkMode(hdcStatic, TRANSPARENT);
+            SetBkMode(hdcStatic, TRANSPARENT);
             SetTextColor(hdcStatic, RGB(255, 255, 255));
             HBRUSH BGColorBrush = CreateSolidBrush(RGB(0, 0, 255));
             return (LRESULT)BGColorBrush;
         }
-        break;
     }
     return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
@@ -214,17 +217,20 @@ public:
         ClipBoardLength = 0;
         // Try opening the clipboard
         if (!OpenClipboard(nullptr)) {
-            // error
+            odprintf("OpenClipboard failed: %lu", GetLastError());
+            return;
         }
         // Get handle of clipboard object for ANSI text
         HANDLE hData = GetClipboardData(CF_TEXT);
         if (hData == NULL) {
+            CloseClipboard();
             return;
         }
 
         // Lock the handle to get the actual text pointer
         char* pszText = static_cast<char*>(GlobalLock(hData));
         if (pszText == NULL) {
+            CloseClipboard();
             return;
         }
 
@@ -339,8 +345,9 @@ HotKey_handler::HotKey_handler() {
                 kbdEmulator->ResetShiftKeys();
                 force_eng_kbd_layout();
                 Sleep(500);
-                for (int i = 0; i < clipboard->GetClipBoardSize(); i++) {
-                    progress_bar->Update(i, (int) clipboard->GetClipBoardSize());
+                size_t size = clipboard->GetClipBoardSize();
+                for (size_t i = 0; i < size; i++) {
+                    progress_bar->Update((int) i, (int) size);
                     kbdEmulator->SendKey(clipboard->GetNextChar());
                 }
 
@@ -351,7 +358,7 @@ HotKey_handler::HotKey_handler() {
             if (msg.wParam == QUIT_KEYID) {
                 odprintf("WM_HOTKEY quit received\n");
                 odprintf("program quit");
-                std::string MsgBoxText = constants::PRODUCT_NAME + "Terminated";
+                std::string MsgBoxText = constants::PRODUCT_NAME + " terminated";
                 std::string MsxBoxCaption = constants::PRODUCT_NAME + " " + constants::PRODUCT_VERSION + " by Daniel Alfredsson";
                 int msgboxID = MessageBoxA(NULL, MsgBoxText.c_str(), MsxBoxCaption.c_str(), MB_OK | MB_ICONINFORMATION | MB_TOPMOST | MB_SETFOREGROUND | MB_DEFAULT_DESKTOP_ONLY);
                 exit(0);
